@@ -117,7 +117,7 @@
         }
 
         // Fetch voting results from the Flask backend
-        fetch('http://127.0.0.1:5000/results')
+        fetch('https://voting-application-gkf0.onrender.com/results')
             .then(response => response.json())
             .then(data => {
                 if (data.vote_counts && Array.isArray(data.vote_counts)) {
