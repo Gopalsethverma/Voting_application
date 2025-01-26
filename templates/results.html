@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Results</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="results.css">
+</head>
+<body>
+    <div class="results-container">
+        <div class="header">
+            <i class="fas fa-chart-bar"></i>
+            <h1>Election Results</h1>
+            <p class="subtitle">Real-time Voting Insights</p>
+        </div>
+
+        <div class="results-grid">
+            <div class="results-table-container">
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Vote Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                        <!-- Results will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="resultsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="total-votes">
+            <h3>Total Votes: <span id="total-votes-count">0</span></h3>
+        </div>
+
+        <a href="/templates/index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Voting
+        </a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script>
+        let resultsChart;
+
+        function calculatePercentage(count, total) {
+            return total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            
+            // Destroy previous chart if exists
+            if (resultsChart) {
+                resultsChart.destroy();
+            }
+
+            resultsChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(item => item.candidate),
+                    datasets: [{
+                        data: data.map(item => item.vote_count),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(75, 192, 192, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Voting Distribution'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateResults(data) {
+            const resultsBody = document.getElementById('results-body');
+            const totalVotesSpan = document.getElementById('total-votes-count');
+            
+            // Clear previous results
+            resultsBody.innerHTML = '';
+            
+            // Calculate total votes
+            const totalVotes = data.reduce((sum, item) => sum + item.vote_count, 0);
+            totalVotesSpan.textContent = totalVotes;
+
+            // Populate table
+            data.forEach(vote => {
+                const row = resultsBody.insertRow();
+                const candidateCell = row.insertCell(0);
+                const voteCountCell = row.insertCell(1);
+                const percentageCell = row.insertCell(2);
+
+                candidateCell.innerText = vote.candidate;
+                voteCountCell.innerText = vote.vote_count;
+                percentageCell.innerText = calculatePercentage(vote.vote_count, totalVotes) + '%';
+            });
+
+            // Render chart
+            renderChart(data);
+        }
+
+        // Fetch voting results from the Flask backend
+        fetch('http://127.0.0.1:5000/results')
+            .then(response => response.json())
+            .then(data => {
+                if (data.vote_counts && Array.isArray(data.vote_counts)) {
+                    updateResults(data.vote_counts);
+                } else {
+                    console.error('Invalid data format:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching results:', error);
+            });
+    </script>
+</body>
+</html>

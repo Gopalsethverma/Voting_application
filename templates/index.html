@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Central - Cast Your Vote</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <div class="voting-container">
+        <div class="header">
+            <i class="fas fa-vote-yea"></i>
+            <h1>Election Central</h1>
+            <p class="subtitle">Cast Your Vote for the Future</p>
+        </div>
+
+        <form id="voteForm">
+            <div class="candidate-grid">
+                <label class="candidate-card" onclick="selectCandidate(this)">
+                    <input type="radio" name="candidate" value="Candidate A" required>
+                    <h3>Candidate A</h3>
+                    <p>Progressive Vision</p>
+                </label>
+                <label class="candidate-card" onclick="selectCandidate(this)">
+                    <input type="radio" name="candidate" value="Candidate B" required>
+                    <h3>Candidate B</h3>
+                    <p>Economic Reform</p>
+                </label>
+                <label class="candidate-card" onclick="selectCandidate(this)">
+                    <input type="radio" name="candidate" value="Candidate C" required>
+                    <h3>Candidate C</h3>
+                    <p>Social Justice</p>
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Your Vote</button>
+        </form>
+
+        <div id="message"></div>
+
+        <a href="/templates/results.html" class="results-link">
+            View Election Results
+        </a>
+    </div>
+
+    <script>
+        function selectCandidate(card) {
+            document.querySelectorAll('.candidate-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            
+            card.classList.add('selected');
+            card.querySelector('input[type="radio"]').checked = true;
+        }
+
+        document.getElementById('voteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const candidate = document.querySelector('input[name="candidate"]:checked').value;
+            
+            fetch('http://127.0.0.1:5000/submit_vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ candidate: candidate }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageEl = document.getElementById('message');
+                messageEl.innerText = data.message;
+                messageEl.classList.add('show');
+
+                // Hide message after 3 seconds
+                setTimeout(() => {
+                    messageEl.classList.remove('show');
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const messageEl = document.getElementById('message');
+                messageEl.innerText = 'Error submitting vote. Please try again.';
+                messageEl.classList.add('show');
+                
+                // Hide error message after 3 seconds
+                setTimeout(() => {
+                    messageEl.classList.remove('show');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
