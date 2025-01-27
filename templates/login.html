@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            font-size: 14px;
+            color: #333;
+        }
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .form-toggle {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .form-toggle a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .form-toggle a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="login-form">
+    <h2>Login</h2>
+    <form onsubmit="login(event)">
+        <label for="login-email">Email:</label>
+        <input type="email" id="login-email" name="email" required>
+        
+        <label for="login-password">Password:</label>
+        <input type="password" id="login-password" name="password" required>
+        
+        <button type="submit" class="btn">Login</button>
+    </form>
+    <div class="form-toggle">
+        <p>Don't have an account? <a href="#" onclick="toggleForms()">Register here</a></p>
+    </div>
+</div>
+
+<div class="container" id="register-form" style="display: none;">
+    <h2>Register</h2>
+    <form onsubmit="register(event)">
+        <label for="register-name">Full Name:</label>
+        <input type="text" id="register-name" name="name" required>
+        
+        <label for="register-email">Email:</label>
+        <input type="email" id="register-email" name="email" required>
+        
+        <label for="register-password">Password:</label>
+        <input type="password" id="register-password" name="password" required>
+        
+        <button type="submit" class="btn">Register</button>
+    </form>
+    <div class="form-toggle">
+        <p>Already have an account? <a href="#" onclick="toggleForms()">Login here</a></p>
+    </div>
+</div>
+
+<script>
+    const users = [];
+
+    function toggleForms() {
+        var loginForm = document.getElementById('login-form');
+        var registerForm = document.getElementById('register-form');
+        
+        if (loginForm.style.display === 'none') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
+    }
+
+    function register(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+
+        // Save user to the "users" array (simulation of server-side storage)
+        users.push({ name, email, password });
+
+        alert("Registration successful. You can now login.");
+        toggleForms();
+    }
+
+    function login(event) {
+        event.preventDefault();
+
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        // Find user by email and validate password
+        const user = users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+            alert("Login successful!");
+            window.location.href = 'index.html'; // Redirect to index.html after successful login
+        } else {
+            alert("Invalid email or password. Please try again.");
+        }
+    }
+</script>
+
+</body>
+</html>
